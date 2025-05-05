@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<section id="hero1" class="d-flex align-items-center">
+    <div class="container position-relative" data-aos="fade-up" data-aos-delay="100">
+        <div class="row justify-content-center">
+
+            <div class="col-xl-12 col-lg-12 text-center">
+
+                <h1>{{single_test.test_name}}</h1>
+                <br>
+                <h2>Вопросов в тесте: {{ test_question_amount }}</h2>
+
+                <div class="text-center">
+                    <a href="{% url 'question_details' single_test.category.slug single_test.slug first_question_id%}?id={{first_question_id}}"
+                       class="btn-get-started scrollto">Начать тест</a>
+                </div>
+                <br>
+                <br>
+                <br>
+                <h2>{{single_test.description}}</h2>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
