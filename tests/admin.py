@@ -1,6 +1,6 @@
 from django.contrib import admin
 from tests.forms import AnswerInlineFormSet
-from tests.models import Test, Question, Answer, Results, Trait
+from tests.models import Test, Question, Answer, Results, Trait, UserResponse
 import json
 from django.core.exceptions import ValidationError
 from django.forms import BaseInlineFormSet
@@ -195,3 +195,4 @@ admin.site.register(Question, QuestionAdmin)
 admin.site.register(Answer, AnswerAdmin)
 admin.site.register(Results, ResultsAdmin)
 admin.site.register(Trait)
+admin.site.register(UserResponse)

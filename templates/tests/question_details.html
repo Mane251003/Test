@@ -24,7 +24,44 @@
 
                     <h1>{{ current_question_number }}. {{ question }}</h1>
                     <br>
-                    <br>
+                    <br>  
+                    {% if question.question_type == 'yes_no' %}
+                      <label>
+                        <input type="radio" name="question_{{ q.id }}" value="Այո" required> Այո
+                      </label>
+                      <label>
+                        <input type="radio" name="question_{{ q.id }}" value="Ոչ" required> Ոչ
+                      </label>
+  
+                    {% elif question.question_type == 'multiple_choice' %}
+                      {% for opt in q.get_options %}
+                        <label>
+                          <input type="radio" name="question_{{ q.id }}" value="{{ opt }}" required> {{ opt }}
+                        </label>
+                      {% endfor %}
+  
+                    {% elif question.question_type == 'open_text' %}
+                      <textarea name="question_{{ q.id }}" rows="3" cols="50" required></textarea>
+  
+                    {% elif question.question_type == 'rating_scale' %}
+                    <div class="rating-scale-wrapper">
+                        <div class="scale-labels">
+                            <span>{{ question.scale_min }}</span>
+                            <span>{{ question.scale_max }}</span>
+                        </div>
+                        <input type="range" 
+                               class="form-range" 
+                               min="{{ question.scale_min }}" 
+                               max="{{ question.scale_max }}" 
+                               value="{{ question.scale_min }}"
+                               name="rating_value"
+                               id="ratingSlider">
+                        <output id="currentValue">{{ question.scale_min }}</output>
+                    </div>
+                    
+                        
+                    {% else %}
+                     
 
                     {% for answer in answers %}
                     <div class="form-check" align="left" style="margin: 0px 0px 0px 0px">
@@ -32,10 +69,11 @@
                                name="boxes">
                         <label class="form-check-label" for="{{answer}}">{{answer}}</label>
                         <img src="{{answer.answer_image.url}}" width="30" height="30" style="border-radius: 50%" alt="No image">
-
                     </div>
                     <br>
                     {% endfor %}
+
+                    {% endif %}  
 
                     <br>
 
@@ -54,7 +92,49 @@
     </div>
 </section>
 
+
+
+<style>
+    .rating-scale-wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .scale-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    
+    #ratingSlider {
+        width: 100%;
+        height: 50px;
+    }
+    
+    #currentValue {
+        display: block;
+        text-align: center;
+        font-size: 24px;
+        margin-top: 10px;
+    }
+</style>
+    
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const slider = document.getElementById('ratingSlider');
+        const output = document.getElementById('currentValue');
+        
+        if(slider) {
+            slider.oninput = function() {
+                output.value = this.value;
+            }
+            
+            // Առաջին լoading-ի ժամանակ ցույց տալ նախնական արժեքը
+            output.value = slider.value;
+        }
+    });
+   
 $(function() {
 if (window.history && window.history.pushState) {
 $(window).on('popstate', function () {

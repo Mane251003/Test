@@ -208,3 +208,19 @@ class Results(models.Model):
     class Meta:
         verbose_name = 'Результат'
         verbose_name_plural = 'Результаты'
+
+
+
+class UserResponse(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name='User')
+    question = models.ForeignKey('Question', on_delete=models.CASCADE, verbose_name='Question')
+    value = models.FloatField(verbose_name='Value')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created')
+
+    class Meta:
+        verbose_name = 'User Response'
+        verbose_name_plural = 'User Responses'
+        unique_together = ('user', 'question')
+
+    def __str__(self):
+        return f"{self.user.email} - {self.question.question[:50]}"

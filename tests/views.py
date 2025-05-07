@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from category.models import Category
-from tests.models import Test, Question, Answer, Results
+from tests.models import Test, Question, Answer, Results, UserResponse
 
 
 def tests(request, category_slug=None):
@@ -59,10 +59,10 @@ def question_details(request, category_slug, test_slug, question_id):
             else:
                 last_question = False
                 next_question_id = question_list[pk_idx + 1].pk
-
+            
             question = get_object_or_404(Question, pk=question_id)
             answers = Answer.objects.filter(question__pk=question_id)
-
+            
             context = {
                 'single_test': single_test,
                 'question': question,
@@ -77,12 +77,29 @@ def question_details(request, category_slug, test_slug, question_id):
 
             if request.method == 'POST':
                 previous_question_id = request.META.get('HTTP_REFERER').split('=')[1]
+                previous_question = Question.objects.get(pk=int(previous_question_id))
+                question = Question.objects.get(pk=int(previous_question_id))
+                
+                
                 answers = Answer.objects.filter(question__pk=int(previous_question_id))
 
                 id_list = request.POST.getlist('boxes')
                 checked_answers = [Answer.objects.get(pk=int(answer_id)) for answer_id in id_list]
                 correct = all([answer.is_correct for answer in checked_answers])
                 unchecked_answers = [answer.is_correct for answer in answers if answer not in checked_answers]
+                # Նոր լոգիկա rating_scale-ի համար
+                if question.question_type == 'rating_scale':
+                    rating_value = request.POST.get('rating_value')
+                    # Պահպանել արժեքը session-ում կամ մոդելում
+                   # request.session[f'question_{question.id}'] = rating_value
+                    UserResponse.objects.update_or_create(
+                        user=request.user,
+                        question=previous_question,
+                        defaults={'value': rating_value}
+                    )
+                else:
+                    # Հին լոգիկա checkbox-ների համար
+                    id_list = request.POST.getlist('boxes')
 
                 if correct and True not in unchecked_answers:
                     request.session['correct_answers'] += 1
