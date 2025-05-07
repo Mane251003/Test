@@ -3,9 +3,32 @@ from tests.forms import AnswerInlineFormSet
 from tests.models import Test, Question, Answer, Results, Trait
 import json
 from django.core.exceptions import ValidationError
+from django.forms import BaseInlineFormSet
+
+
+
+
+
+class RequiredAnswerInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        if any(self.errors):
+            return
+        question = self.instance
+        if not question.question_type:
+            # Ստուգում՝ առնվազն մեկ չջնջված ձեւ կա՞
+            valid = False
+            for form in self.forms:
+                if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                    valid = True
+                    break
+            if not valid:
+                raise ValidationError("Առնվազն մեկ պատասխան պետք է մուտքագրվի։")
+
+
 class AnswerInline(admin.TabularInline):
     """Display answer fields inline Question model"""
-    formset = AnswerInlineFormSet
+    formset =RequiredAnswerInlineFormSet
     model = Answer
     extra = 0
 
@@ -49,7 +72,7 @@ class TestAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("test_name",)}
     inlines = [QuestionInline]
 
-
+            
 class QuestionAdmin(admin.ModelAdmin):
     """Display Question model fields in admin panel"""
     list_display = ('question', 'test', 'question_type')

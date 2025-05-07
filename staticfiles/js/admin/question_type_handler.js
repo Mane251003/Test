@@ -28,6 +28,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         switch(selectedType) {
+            case '':
+                // --- եթե դատարկ է՝ բոլոր ընտրանքային դաշտերը միացրած, բայց **ձևաթող** թողնենք՞
+                if (multipleChoiceField) {
+                    multipleChoiceField.value = '';
+                    multipleChoiceField.disabled = true;
+                }
+                if (openTextField) {
+                    openTextField.value = '';
+                    openTextField.disabled = true;
+                }
+                ratingFields.forEach(field => {
+                    field.value = '';
+                    field.disabled = true;
+                });
+                break;
+                
             case 'yes_no':
                 if (multipleChoiceField) {
                     multipleChoiceField.value = yesNoOptions;

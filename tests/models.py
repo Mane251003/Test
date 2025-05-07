@@ -59,6 +59,8 @@ class Test(models.Model):
         return self.test_name
 
 
+
+
 class Question(models.Model):
     """Create question model in database"""
     objects = models.Manager()
@@ -81,7 +83,8 @@ class Question(models.Model):
         max_length=50, 
         choices=TYPE_CHOICES, 
         default='yes_no',
-        blank=True
+        blank=True, 
+        null=True
     )
     scale_min = models.IntegerField(
         blank=True,
