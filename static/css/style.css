@@ -10,25 +10,6 @@
 --------------------------------------------------------------*/
 
 /* static/css/styles.css */
-.big5-results .progress {
-  height: 25px;
-}
-
-.trait-card {
-  background: #f8f9fa;
-  transition: transform 0.3s;
-}
-
-.trait-card:hover {
-  transform: translateY(-5px);
-}
-
-.general-description {
-  background: #fff;
-  box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
-}
-
-/* static/css/styles.css */
 .progress {
   height: 25px;
 }

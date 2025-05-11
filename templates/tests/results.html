@@ -2,90 +2,311 @@
 {% load static %}
 
 {% block content %}
+{% block extra_css %}
+<style>
+    /* Custom CSS for Big5 results */
+    .trait-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(8.5px);
+        -webkit-backdrop-filter: blur(8.5px);
+        transition: all 0.3s ease;
+    }
 
-<section id="hero1" class="d-flex align-items-center">
-    <div class="container position-relative" data-aos="fade-up" data-aos-delay="100">
-        <br>
-        <br>
-        <br>
+    .trait-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .progress-container {
+        height: 20px;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 10px;
+    }
+
+    .trait-description {
+        border-left: 3px solid #6366f1;
+        padding-left: 1rem;
+        margin: 1rem 0;
+    }
+
+    /* Modal styles */
+    .description-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        z-index: 10000;
+        display: none;
+        padding: 2rem;
+        overflow-y: auto;
+    }
+
+    .modal-content {
+        background: white;
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 0 30px rgba(0,0,0,0.3);
+        position: relative;
+        animation: modalEnter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes modalEnter {
+        from { transform: translateY(50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #6366f1;
+    }
+
+    .modal-expanded-text {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    @media (max-width: 768px) {
+        .trait-card {
+            margin: 0 0.5rem;
+        }
+        .modal-content {
+            width: 95%;
+            padding: 1rem;
+        }
+    }
+    
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    }
+
+    .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        text-align: center;
+    }
+
+    .result-item {
+       padding: 2rem;
+       border-radius: 1rem;
+    }
+
+    .result-item.correct { background: #f0fdf4; }
+    .result-item.incorrect { background: #fef2f2; }
+    .result-item.percent { background: #f0f9ff; }
+
+    .read-more-btn {
+        color: #6366f1;
+        cursor: pointer;
+        font-weight: 500;
+        background: none;
+        border: none;
+        padding: 0;
+        text-align: left;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .read-more-btn:hover {
+        color: #4338ca;
+    }
+</style>
+{% endblock %}
+
+<!-- Modal markup outside of loop -->
+<div class="description-modal">
+    <div class="modal-content">
+        <span class="modal-close">×</span>
+        <div class="modal-expanded-text"></div>
+    </div>
+</div>
+
+<section id="results" class="min-vh-100 d-flex align-items-center">
+    <div class="container" data-aos="fade-up">
         <div class="row justify-content-center">
-            <div class="col-xl-12 col-lg-12 text-center">
-                <h2>Категория - {{ data.category.category_name }}</h2>
-                <br>
-                <h1>Тест "{{ data.test.test_name }}"</h1>
-
-                <div class="text-center">
-                    <a href="{% url 'test_description' category_slug test_slug %}" class="btn-get-started scrollto">&#8634; Пройти тест еще раз</a>
-                </div>
-                <br>
-                <br>
-                <h2>Ваши результаты:</h2>
-                <br>
-
-                {% if is_big5 %}
-                <div class="big5-results mt-5">
-                    <h3>Անհատականության Պրոֆիլ</h3>
+            <div class="col-lg-10 text-center">
+                
+                <!-- Header Section -->
+                <div class="mb-5">
+                    <h2 class="text-muted mb-3">Категория: {{ data.category.category_name }}</h2>
+                    <h1 class="display-4 mb-4">"{{ data.test.test_name }}"</h1>
                     
-                    {% for trait_code, trait_data in interpretation.items %}
-                    <div class="trait-card mb-4 p-3 border rounded">
-                        <h4>{{ trait_data.name }} - {{ trait_data.score|floatformat:1 }}%</h4>
-                        <div class="--progress mb-2">
-                            <div class="progress-bar" role="progressbar" 
-                                style="--progress-width: {{ trait_data.score|floatformat:'0'|default:0 }}%; width: var(--progress-width);"
-                                aria-valuenow="{{ trait_data.score|floatformat:'0'|default:0 }}" 
-                                aria-valuemin="0" 
-                                aria-valuemax="100">
-                            </div> 
-                        </div>
-                        <div class="trait-description">
-                            {{ trait_data.description|safe }}
-                        </div>
+                    <div class="d-flex gap-3 justify-content-center mb-5">
+                        <a href="{% url 'test_description' category_slug test_slug %}" 
+                           class="btn btn-primary btn-lg px-4 py-2">
+                           <i class="bi bi-arrow-repeat me-2"></i>Пересдать тест
+                        </a>
                     </div>
-                    {% endfor %}
-                    <div class="general-description card mt-4">
-                        <div class="card-body">
-                            <h4 class="card-title">Ընդհանուր Բնութագիր</h4>
-                            {% for desc in general_description.values %}
-                            <div class="card-text">
-                                {{ desc|safe }}
+                </div>
+
+                <!-- Results Content -->
+                {% if is_big5 %}
+                <div class="big5-results">
+                    <h2 class="mb-5 fw-bold">Ваши результаты:</h2>
+                    
+                    <!-- Personality Profile -->
+                    <div class="mb-5">
+                        <h3 class="mb-4 display-6">Անհատականության Պրոֆիլ</h3>
+                        
+                        <div class="row g-4">
+                            {% for trait_code, trait_data in interpretation.items %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="trait-card p-4 h-100">
+                                    <h4 class="h5 mb-3 fw-semibold">
+                                        {{ trait_data.name }} 
+                                        <span class="text-primary ms-2">{{ trait_data.score|floatformat:1 }}%</span>
+                                    </h4>
+                                    
+                                    <div class="--progress mb-2">
+                                        <div class="progress-bar" role="progressbar" 
+                                            style="--progress-width: {{ trait_data.score|floatformat:'0'|default:0 }}%; width: var(--progress-width);"
+                                            aria-valuenow="{{ trait_data.score|floatformat:'0'|default:0 }}" 
+                                            aria-valuemin="0" 
+                                            aria-valuemax="100">
+                                        </div> 
+                                    </div>
+                                    
+                                    <div class="trait-description text-start">
+                                        <div class="description-content">
+                                            {{ trait_data.description|truncatewords:50|safe }}
+                                        </div>
+                                        <button class="read-more-btn" 
+                                                data-fulltext="{{ trait_data.description|escapejs }}">
+                                            Կարդալ ավելին →
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             {% endfor %}
                         </div>
                     </div>
+
+                    <!-- General Description -->
+                    <div class="general-description mt-5">
+                        <div class="card border-0 shadow-lg">
+                            <div class="card-header bg-gradient-primary text-white py-3">
+                                <h4 class="mb-0">Ընդհանուր Բնութագիր</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-4">
+                                    {% for desc in general_description.values %}
+                                    <div class="col-md-6">
+                                        <div class="p-3 bg-light rounded-2">
+                                            {{ desc|safe }}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 {% else %}
+                <!-- Regular Test Results -->
                 <div class="regular-results">
-                    <h2>&#9989; Правильных ответов: {{ data.correct_answer_count }}/{{ test_question_amount }}</h2>
-                    <h2>&#10060; Неправильных ответов: {{ data.wrong_answer_count }}/{{ test_question_amount }}</h2>
-                    <h2>Процент правильных ответов: {{ data.correct_answer_percent }}</h2>
-            
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-body p-5">
+                            <h2 class="mb-4 display-6">Результаты теста</h2>
+                            
+                            <div class="results-grid">
+                                <div class="result-item correct">
+                                    <i class="bi bi-check2-circle fs-1"></i>
+                                    <h3>{{ data.correct_answer_count }}/{{ test_question_amount }}</h3>
+                                    <p>Правильные ответы</p>
+                                </div>
+                                
+                                <div class="result-item incorrect">
+                                    <i class="bi bi-x-circle fs-1"></i>
+                                    <h3>{{ data.wrong_answer_count }}/{{ test_question_amount }}</h3>
+                                    <p>Неправильные ответы</p>
+                                </div>
+                                
+                                <div class="result-item percent">
+                                    <i class="bi bi-graph-up fs-1"></i>
+                                    <h3>{{ data.correct_answer_percent }}%</h3>
+                                    <p>Процент успеха</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 {% endif %}
-                <br>
-                <br>
-                <br>
-                <div>
-                    <a href="{% url 'tests' %}" class="btn btn-outline-primary"><i class="bi bi-arrow-left">
-                    </i> К тестам!</a>
+
+                <!-- Back Button -->
+                <div class="mt-5">
+                    <a href="{% url 'tests' %}" class="btn btn-outline-dark btn-lg px-4 py-2">
+                        <i class="bi bi-arrow-left me-2"></i>К списку тестов
+                    </a>
                 </div>
             </div>
         </div>
-
     </div>
 </section>
 
 <script>
-$(function() {
-if (window.history && window.history.pushState) {
-$(window).on('popstate', function () {
-window.history.pushState('forward', null, '#');
-window.history.forward(1);
+// Progress bar animation
+document.addEventListener('DOMContentLoaded', function() {
+    const progressBars = document.querySelectorAll('.progress-bar');
+    progressBars.forEach(bar => {
+        const targetWidth = bar.style.width;
+        bar.style.width = '0';
+        setTimeout(() => {
+            bar.style.width = targetWidth;
+        }, 100);
+    });
 });
-}
- window.history.pushState ('forward', null, '#');
-window.history.forward(1);
-})
 
+// Modal functionality
+const modal = document.querySelector('.description-modal');
+const modalText = document.querySelector('.modal-expanded-text');
+const closeBtn = document.querySelector('.modal-close');
+
+document.querySelectorAll('.read-more-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        modalText.innerHTML = this.dataset.fulltext;
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    });
+});
+
+// Close modal
+closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+});
+
+// Close modal on backdrop click
+modal.addEventListener('click', (e) => {
+    if(e.target === modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+});
+
+// Prevent closing when clicking inside modal
+document.querySelector('.modal-content').addEventListener('click', (e) => {
+    e.stopPropagation();
+});
 </script>
 
 {% endblock %}
