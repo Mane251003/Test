@@ -8,7 +8,7 @@ import json
 from django.utils.timezone import now
 from .validators import validate_options
 from django.core.validators import MinValueValidator, MaxValueValidator
-
+from django.utils import timezone
 
 class Trait(models.Model):
     CODE_CHOICES = [
@@ -190,8 +190,64 @@ class Answer(models.Model):
         return self.answer if self.answer else f"Answer {self.id}"
 
 
+
+
+class TestSession(models.Model):
+    candidate=models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name='Candidate')
+    test=models.ForeignKey(Test,on_delete=models.CASCADE)
+    start_time=models.DateTimeField(auto_now_add=True, verbose_name='start time')
+    end_time=models.DateTimeField(null=True, blank=True, verbose_name='end time')
+    STATUS_CHOICES = [
+    ('in_progress', 'In Progress'),
+    ('completed', 'Completed'),
+    ('expired', 'Expired')
+]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='in_progress')
+
+    class Meta:
+        verbose_name = "Test Session"
+        verbose_name_plural = "Test Sessions"
+        ordering = ['-start_time']
+
+    
+    def duration(self):
+        if self.end_time:
+            return self.end_time-self.start_time
+        return None
+
+class UserResponse(models.Model):
+    session=models.ForeignKey(TestSession, related_name="responses", on_delete=models.CASCADE, verbose_name='Session')
+    question = models.ForeignKey('Question', on_delete=models.CASCADE, verbose_name='Question')
+    value = models.FloatField(verbose_name='Value')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created')
+
+    class Meta:
+        verbose_name = 'User Response'
+        verbose_name_plural = 'User Responses'
+        unique_together = ('session', 'question')
+
+    def __str__(self):
+        return f"{self.session.candidate.email} - {self.question.question[:50]}"
+    
+
 class Results(models.Model):
     """Create results model in database"""
+    #For Big 5 test
+    session=models.OneToOneField(TestSession, on_delete=models.CASCADE)
+    raw_scores = models.JSONField(default=dict, blank=True, null=True)
+    normalized_scores = models.JSONField(default=dict, blank=True)
+    interpretation = models.JSONField(default=dict, blank=True)
+    general_description=models.JSONField(default=dict, blank=True)
+    recommendations = models.JSONField(default=dict, blank=True)
+    theoretical_scores = models.JSONField(default=dict, blank=True)
+    scenario_analysis = models.JSONField(default=dict)
+    scale_evaluations = models.JSONField(default=dict)
+    free_response_analysis = models.TextField(blank=True)
+    generated_at = models.DateTimeField(auto_now_add=True)
+    is_archived = models.BooleanField(default=False)
+
+
+
     objects = models.Manager()
     user = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name='Пользователь')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория')
@@ -204,23 +260,11 @@ class Results(models.Model):
 
     def __str__(self):
         return self.test.test_name
+    
+    def get_trait_score(self, trait_code):
+        return self.normalized_scores.get(trait_code, 0)
+
 
     class Meta:
         verbose_name = 'Результат'
         verbose_name_plural = 'Результаты'
-
-
-
-class UserResponse(models.Model):
-    user = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name='User')
-    question = models.ForeignKey('Question', on_delete=models.CASCADE, verbose_name='Question')
-    value = models.FloatField(verbose_name='Value')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created')
-
-    class Meta:
-        verbose_name = 'User Response'
-        verbose_name_plural = 'User Responses'
-        unique_together = ('user', 'question')
-
-    def __str__(self):
-        return f"{self.user.email} - {self.question.question[:50]}"

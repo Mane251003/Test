@@ -21,9 +21,46 @@
                 <br>
                 <h2>Ваши результаты:</h2>
                 <br>
-                <h2>&#9989; Правильных ответов: {{ data.correct_answer_count }}/{{ test_question_amount }}</h2>
-                <h2>&#10060; Неправильных ответов: {{ data.wrong_answer_count }}/{{ test_question_amount }}</h2>
-                <h2>Процент правильных ответов: {{ data.correct_answer_percent }}</h2>
+
+                {% if is_big5 %}
+                <div class="big5-results mt-5">
+                    <h3>Անհատականության Պրոֆիլ</h3>
+                    
+                    {% for trait_code, trait_data in interpretation.items %}
+                    <div class="trait-card mb-4 p-3 border rounded">
+                        <h4>{{ trait_data.name }} - {{ trait_data.score|floatformat:1 }}%</h4>
+                        <div class="--progress mb-2">
+                            <div class="progress-bar" role="progressbar" 
+                                style="--progress-width: {{ trait_data.score|floatformat:'0'|default:0 }}%; width: var(--progress-width);"
+                                aria-valuenow="{{ trait_data.score|floatformat:'0'|default:0 }}" 
+                                aria-valuemin="0" 
+                                aria-valuemax="100">
+                            </div> 
+                        </div>
+                        <div class="trait-description">
+                            {{ trait_data.description|safe }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="general-description card mt-4">
+                        <div class="card-body">
+                            <h4 class="card-title">Ընդհանուր Բնութագիր</h4>
+                            {% for desc in general_description.values %}
+                            <div class="card-text">
+                                {{ desc|safe }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="regular-results">
+                    <h2>&#9989; Правильных ответов: {{ data.correct_answer_count }}/{{ test_question_amount }}</h2>
+                    <h2>&#10060; Неправильных ответов: {{ data.wrong_answer_count }}/{{ test_question_amount }}</h2>
+                    <h2>Процент правильных ответов: {{ data.correct_answer_percent }}</h2>
+            
+                </div>
+                {% endif %}
                 <br>
                 <br>
                 <br>

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from tests.forms import AnswerInlineFormSet
-from tests.models import Test, Question, Answer, Results, Trait, UserResponse
+from tests.models import Test, Question, Answer, Results, Trait, UserResponse, TestSession
 import json
 from django.core.exceptions import ValidationError
 from django.forms import BaseInlineFormSet
@@ -190,9 +190,21 @@ class ResultsAdmin(admin.ModelAdmin):
     search_fields = ('user__email',)
 
 
+
+
+class TestSessionAdmin(admin.ModelAdmin):
+    list_display = ('candidate', 'test', 'start_time', 'end_time', 'duration')
+    list_filter = ('test', 'start_time')
+    search_fields = ('candidate__email', 'test__title')
+
+class UserResponseAdmin(admin.ModelAdmin):
+    list_display = ('session', 'question', 'value')
+    raw_id_fields = ('session', 'question')
+
 admin.site.register(Test, TestAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Answer, AnswerAdmin)
 admin.site.register(Results, ResultsAdmin)
 admin.site.register(Trait)
 admin.site.register(UserResponse)
+admin.site.register(TestSession)
