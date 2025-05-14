@@ -1,0 +1,13 @@
+/* static/css/custom.css */
+
+/* Fix appearance warnings */
+select,
+button,
+input,
+textarea {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Ավելացրեք այլ կարգավորումներ */

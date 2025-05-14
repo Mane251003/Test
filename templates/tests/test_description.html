@@ -3,29 +3,85 @@
 
 {% block content %}
 
-<section id="hero1" class="d-flex align-items-center">
-    <div class="container position-relative" data-aos="fade-up" data-aos-delay="100">
+
+<section class="notebook-test-description">
+    <div class="container">
         <div class="row justify-content-center">
-
-            <div class="col-xl-12 col-lg-12 text-center">
-
-                <h1>{{single_test.test_name}}</h1>
-                <br>
-                <h2>Вопросов в тесте: {{ test_question_amount }}</h2>
-
-                <div class="text-center">
-                    <a href="{% url 'question_details' single_test.category.slug single_test.slug first_question_id%}?id={{first_question_id}}"
-                       class="btn-get-started scrollto">Начать тест</a>
+            <div class="col-lg-8">
+                
+                <!-- Վերնագիր -->
+                <div class="text-center mb-5">
+                    <h1>  </h1>
+                    <h1>  </h1>
+                    <h1 class="display-5 mb-4">                              
+                        {{single_test.test_name}}</h1>
+                    <div class="badge bg-primary text-white p-3 fs-5">
+                        <i class="bi bi-list-ol me-2"></i>
+                        {{ test_question_amount }} հարց
+                    </div>
                 </div>
-                <br>
-                <br>
-                <br>
-                <h2>{{single_test.description}}</h2>
+
+                <!-- Նկարագրության բլոկ -->
+                <div class="description-box bg-white p-5 rounded-3 mb-5">
+                    <h2 class="h4 mb-4">Թեստի մասին</h2>
+                    <div class="fs-5 lh-base text-secondary">
+                        {{single_test.description|linebreaks}}
+                    </div>
+                </div>
+
+                <!-- Սկսելու բաժին -->
+                <div class="text-center pt-4">
+                    <a href="{% url 'question_details' single_test.category.slug single_test.slug first_question_id%}?id={{first_question_id}}" 
+                       class="btn btn-primary btn-lg px-5 py-3">
+                        <i class="bi bi-play-circle me-2"></i>
+                        Սկսել թեստը
+                    </a>
+                    <p class="text-muted mt-3 mb-0 fs-5">
+                        Յուրաքանչյուր հարցը ցուցադրվում է առանձին էջում
+                    </p>
+                </div>
 
             </div>
         </div>
-
     </div>
 </section>
+
+<style>
+.notebook-test-description {
+    padding: 4rem 0;
+    background: #f8f9fb;
+    min-height: 100vh;
+}
+
+.display-5 {
+    font-size: 2.5rem;
+    color: #2d3748;
+    letter-spacing: -0.5px;
+}
+
+.description-box {
+    border: 1px solid #a4c8f7;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+}
+
+.btn-lg {
+    font-size: 1.1rem;
+    border-radius: 12px;
+    transition: transform 0.2s;
+}
+
+.btn-lg:hover {
+    transform: translateY(-2px);
+}
+
+.badge {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.lh-base {
+    line-height: 1.6;
+}
+</style>
 
 {% endblock %}

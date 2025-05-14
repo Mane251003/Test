@@ -12,23 +12,23 @@ from django.utils import timezone
 
 class Trait(models.Model):
     CODE_CHOICES = [
-        ('O', _('Openness')),
-        ('C', _('Conscientiousness')),
-        ('E', _('Extraversion')),
-        ('A', _('Agreeableness')),
-        ('N', _('Neuroticism')),
+        ('O', 'Լայնախոհություն'),    # Openness
+        ('C', 'Բարեխղճություն'),     # Conscientiousness
+        ('E', 'Էքստրավերտություն'),  # Extraversion
+        ('A', 'Բարյացակամություն'),  # Agreeableness
+        ('N', 'Նեյրոտիզմ')           # Neuroticism
     ]
-    code = models.CharField(max_length=1, choices=CODE_CHOICES, unique=True)
-    name = models.CharField(max_length=20)
-    description = models.TextField()
-    low_range = models.TextField(help_text=_('Description for scores 0-40%'), blank=True)
-    mid_range = models.TextField(help_text=_('Description for scores 40-60%'), blank=True)
-    high_range = models.TextField(help_text=_('Description for scores 60-100%'), blank=True)
+    code = models.CharField(max_length=1, choices=CODE_CHOICES, unique=True, verbose_name=('Կոդ'))
+    name = models.CharField(max_length=20, verbose_name=('Անվանում'))
+    description = models.TextField(verbose_name=('Նկարագրություն'))
+    low_range = models.TextField(help_text=_('Description for scores 0-40%'), blank=True, verbose_name=('Ցածր միջակայք'))
+    mid_range = models.TextField(help_text=_('Description for scores 40-60%'), blank=True, verbose_name=('Միջին միջակայք'))
+    high_range = models.TextField(help_text=_('Description for scores 60-100%'), blank=True, verbose_name=('Բարձր միջակայք'))
     reverse_scored = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = _("Personality Trait")
-        verbose_name_plural = _("Personality Traits")
+        verbose_name = _("Բնավորության գիծ")
+        verbose_name_plural = _("Բնավորության գծեր")
 
     def __str__(self):
         return f"{self.get_code_display()} - {self.name}"
@@ -38,18 +38,18 @@ class Test(models.Model):
     """Create test model in database"""
     objects = models.Manager()
 
-    test_name = models.CharField(max_length=255, unique=True, verbose_name='Наименование теста')
-    slug = models.SlugField(max_length=255, unique=True)
-    description = models.TextField(blank=True, verbose_name='Описание')
-    test_image = models.ImageField(upload_to='photos/tests', verbose_name='Фото теста')
-    created_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
-    modified_date = models.DateTimeField(auto_now=True, verbose_name='Дата изменений')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория')
+    test_name = models.CharField(max_length=255, unique=True, verbose_name='Թեստի անվանում')
+    slug = models.SlugField(max_length=255, unique=True, verbose_name='Թեստի URL հղման համար')
+    description = models.TextField(blank=True, verbose_name='Թեստի նկարագրություն')
+    test_image = models.ImageField(upload_to='photos/tests', verbose_name='Թեստի նկար')
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name='Ստեղծման ամսաթիվ')
+    modified_date = models.DateTimeField(auto_now=True, verbose_name='Փոփոխման ամսաթիվ')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Թեստի կատեգորիա')
 
     class Meta:
         """Define how plural form looks in admin panel"""
-        verbose_name = 'Тест'
-        verbose_name_plural = 'Тесты'
+        verbose_name = 'Թեստ'
+        verbose_name_plural = 'Թեստեր'
 
     def get_url(self):
         """Get reverse url for particular test"""
@@ -73,18 +73,19 @@ class Question(models.Model):
     ]
     
     #test=models.ForeignKey(Test, related_name="questions", on_delete=models.CASCADE)
-    question = models.TextField(verbose_name='Вопрос')
-    test = models.ForeignKey(Test, on_delete=models.CASCADE, verbose_name='Наименование теста', related_name="questions")
+    question = models.TextField(verbose_name='Հարց')
+    test = models.ForeignKey(Test, on_delete=models.CASCADE, verbose_name='Թեստի անվանում', related_name="questions")
     order=models.PositiveBigIntegerField(default=0) 
-    trait=models.ForeignKey('Trait', on_delete=models.PROTECT, related_name='questions')
-    key=models.CharField(max_length=1, choices=[('+', 'Positive'), ('-', 'Negative')], default='+')
+    trait=models.ForeignKey('Trait', on_delete=models.PROTECT, related_name='questions', verbose_name="Բնավորության գիծ", null=True, blank=True)
+    key=models.CharField(max_length=1, choices=[('+', 'Positive'), ('-', 'Negative')], default='+', verbose_name='Հարցի բանալին +/-')
     weight = models.FloatField(default=1.0, validators=[MinValueValidator(0), MaxValueValidator(1)],blank=True, null=True )
     question_type = models.CharField(
         max_length=50, 
         choices=TYPE_CHOICES, 
         default='yes_no',
         blank=True, 
-        null=True
+        null=True,
+        verbose_name='Հարցի տեսակ'
     )
     scale_min = models.IntegerField(
         blank=True,
@@ -165,26 +166,26 @@ class Question(models.Model):
 
     class Meta:
         """Define how plural form looks in admin panel"""
-        verbose_name = 'Вопрос'
-        verbose_name_plural = 'Вопросы'
+        verbose_name = 'Հարց'
+        verbose_name_plural = 'Հարցեր'
 
     def __str__(self):
-        return f"{self.question} ({self.get_question_type_display()}) "
+        return f"{self.question}  "
 
 
 class Answer(models.Model):
     """Create answer model in database"""
     objects = models.Manager()
-    answer = models.CharField(max_length=200, verbose_name='Ответ')
-    answer_image = models.ImageField(upload_to='photos/answers', default='default.jpg', verbose_name='Фото ответа')
-    is_correct = models.BooleanField(default=False, verbose_name='Верно')
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='Вопрос')
+    answer = models.CharField(max_length=200, verbose_name='Պատասխան')
+    answer_image = models.ImageField(upload_to='photos/answers', default='default.jpg', verbose_name='Պատասխանի նկար')
+    is_correct = models.BooleanField(default=False, verbose_name='Պատասխանն ճիշտ է')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='Հարց')
 
 
     class Meta:
         """Define how plural form looks in admin panel"""
-        verbose_name = 'Ответ'
-        verbose_name_plural = 'Ответы'
+        verbose_name = 'Պատասխան'
+        verbose_name_plural = 'Պատասխաններ'
 
     def __str__(self):
         return self.answer if self.answer else f"Answer {self.id}"
@@ -193,10 +194,10 @@ class Answer(models.Model):
 
 
 class TestSession(models.Model):
-    candidate=models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name='Candidate')
+    candidate=models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name="Թեստի մասնակից")
     test=models.ForeignKey(Test,on_delete=models.CASCADE)
-    start_time=models.DateTimeField(auto_now_add=True, verbose_name='start time')
-    end_time=models.DateTimeField(null=True, blank=True, verbose_name='end time')
+    start_time=models.DateTimeField(auto_now_add=True, verbose_name='սկսման ժամանակ')
+    end_time=models.DateTimeField(null=True, blank=True, verbose_name='ավարտման ժամանակ')
     STATUS_CHOICES = [
     ('in_progress', 'In Progress'),
     ('completed', 'Completed'),
@@ -205,8 +206,8 @@ class TestSession(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='in_progress')
 
     class Meta:
-        verbose_name = "Test Session"
-        verbose_name_plural = "Test Sessions"
+        verbose_name = "Թեստի սեսիա"
+        verbose_name_plural = "Թեստի սեսիաներ"
         ordering = ['-start_time']
 
     
@@ -216,10 +217,10 @@ class TestSession(models.Model):
         return None
 
 class UserResponse(models.Model):
-    session=models.ForeignKey(TestSession, related_name="responses", on_delete=models.CASCADE, verbose_name='Session')
-    question = models.ForeignKey('Question', on_delete=models.CASCADE, verbose_name='Question')
-    value = models.FloatField(verbose_name='Value')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created')
+    session=models.ForeignKey(TestSession, related_name="responses", on_delete=models.CASCADE, verbose_name='Սեսիա')
+    question = models.ForeignKey('Question', on_delete=models.CASCADE, verbose_name='Հարց')
+    value = models.FloatField(verbose_name='Պատասխան')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Ստեղծման ամսաթիվ')
 
     class Meta:
         verbose_name = 'User Response'
@@ -249,14 +250,14 @@ class Results(models.Model):
 
 
     objects = models.Manager()
-    user = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name='Пользователь')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория')
-    test = models.ForeignKey(Test, on_delete=models.CASCADE, verbose_name='Тест')
-    correct_answer_count = models.IntegerField(verbose_name='Кол-во верных ответов')
-    wrong_answer_count = models.IntegerField(verbose_name='Кол-во неверных ответов')
-    correct_answer_percent = models.CharField(max_length=10, null=True, verbose_name='Процент правильных ответов')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата прохождения теста')
-    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата повторного прохождения теста')
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name='Օգտատեր')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Կատեգորիա')
+    test = models.ForeignKey(Test, on_delete=models.CASCADE, verbose_name='Թեստի անվանում')
+    correct_answer_count = models.IntegerField(verbose_name='ճիշտ պատասխանների քանակ')
+    wrong_answer_count = models.IntegerField(verbose_name='սխալ պատասխանների քանակ')
+    correct_answer_percent = models.CharField(max_length=10, null=True, verbose_name='ճիշտ պատասխանների տոկոս')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Ստեղծման ամսաթիվ')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Փոփոխման ամսաթիվ')
 
     def __str__(self):
         return self.test.test_name

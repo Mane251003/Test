@@ -64,10 +64,15 @@
         animation: modalEnter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    @keyframes modalEnter {
-        from { transform: translateY(50px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
+   
+    @keyframes textReveal {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+    .modal-expanded-text {
+        animation: textReveal 0.4s ease-out;
+}
 
     .modal-close {
         position: absolute;
@@ -79,6 +84,9 @@
     }
 
     .modal-expanded-text {
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
         font-size: 1.1rem;
         line-height: 1.6;
         max-height: 80vh;
@@ -130,6 +138,8 @@
     .read-more-btn:hover {
         color: #4338ca;
     }
+
+
 </style>
 {% endblock %}
 
@@ -148,13 +158,13 @@
                 
                 <!-- Header Section -->
                 <div class="mb-5">
-                    <h2 class="text-muted mb-3">Категория: {{ data.category.category_name }}</h2>
+                    <h2 class="text-muted mb-3">Կատեգորիա: {{ data.category.category_name }}</h2>
                     <h1 class="display-4 mb-4">"{{ data.test.test_name }}"</h1>
                     
                     <div class="d-flex gap-3 justify-content-center mb-5">
                         <a href="{% url 'test_description' category_slug test_slug %}" 
                            class="btn btn-primary btn-lg px-4 py-2">
-                           <i class="bi bi-arrow-repeat me-2"></i>Пересдать тест
+                           <i class="bi bi-arrow-repeat me-2"></i>Կրկնել թեստը
                         </a>
                     </div>
                 </div>
@@ -162,7 +172,7 @@
                 <!-- Results Content -->
                 {% if is_big5 %}
                 <div class="big5-results">
-                    <h2 class="mb-5 fw-bold">Ваши результаты:</h2>
+                    <h2 class="mb-5 fw-bold">Ձեր արդյունքներն են՝</h2>
                     
                     <!-- Personality Profile -->
                     <div class="mb-5">
@@ -191,7 +201,7 @@
                                             {{ trait_data.description|truncatewords:50|safe }}
                                         </div>
                                         <button class="read-more-btn" 
-                                                data-fulltext="{{ trait_data.description|escapejs }}">
+                                                data-fulltext="{{ trait_data.description|escape }}">
                                             Կարդալ ավելին →
                                         </button>
                                     </div>
@@ -226,25 +236,25 @@
                 <div class="regular-results">
                     <div class="card border-0 shadow-lg">
                         <div class="card-body p-5">
-                            <h2 class="mb-4 display-6">Результаты теста</h2>
+                            <h2 class="mb-4 display-6">Թեստի արդյունքներն են՝</h2>
                             
                             <div class="results-grid">
                                 <div class="result-item correct">
                                     <i class="bi bi-check2-circle fs-1"></i>
                                     <h3>{{ data.correct_answer_count }}/{{ test_question_amount }}</h3>
-                                    <p>Правильные ответы</p>
+                                    <p>Ճիշտ պատասխաններ</p>
                                 </div>
                                 
                                 <div class="result-item incorrect">
                                     <i class="bi bi-x-circle fs-1"></i>
                                     <h3>{{ data.wrong_answer_count }}/{{ test_question_amount }}</h3>
-                                    <p>Неправильные ответы</p>
+                                    <p>Սխալ պատասխաններ</p>
                                 </div>
                                 
                                 <div class="result-item percent">
                                     <i class="bi bi-graph-up fs-1"></i>
-                                    <h3>{{ data.correct_answer_percent }}%</h3>
-                                    <p>Процент успеха</p>
+                                    <h3>{{ data.correct_answer_percent }}</h3>
+                                    <p>Հաջողության տոկոս</p>
                                 </div>
                             </div>
                         </div>
@@ -255,7 +265,7 @@
                 <!-- Back Button -->
                 <div class="mt-5">
                     <a href="{% url 'tests' %}" class="btn btn-outline-dark btn-lg px-4 py-2">
-                        <i class="bi bi-arrow-left me-2"></i>К списку тестов
+                        <i class="bi bi-arrow-left me-2"></i>Վերադառնալ թեստերի ցանկ
                     </a>
                 </div>
             </div>
@@ -282,10 +292,15 @@ const modalText = document.querySelector('.modal-expanded-text');
 const closeBtn = document.querySelector('.modal-close');
 
 document.querySelectorAll('.read-more-btn').forEach(btn => {
+    modalText.style.whiteSpace = 'pre-wrap'; 
+    modalText.style.fontFamily = 'inherit';
     btn.addEventListener('click', function() {
-        modalText.innerHTML = this.dataset.fulltext;
+        const parser = new DOMParser();
+        const decodedText = parser.parseFromString(this.dataset.fulltext, 'text/html').body.textContent;
+        modalText.innerHTML = decodedText;
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
+        
     });
 });
 

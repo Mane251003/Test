@@ -10,22 +10,20 @@
             <div class="col-xl-12 col-lg-12 text-left">
                 <div>
                     <a href="{% url 'test_description' category_slug test_slug %}" class="btn btn-outline-primary">
-                    &#8634; Начать тест заново</a>
+                    &#8634;  Կրկին անցնել թեստը</a>
                 </div>
-                <br>
-                <br>
-                <h1>{{ current_question_number }}/{{ test_question_amount }}</h1>
-                <br>
-                <br>
-                <br>
+                
+                
 
                 <form action="{% url 'question_details' single_test.category.slug single_test.slug next_question_id %}?id={{next_question_id}}" method="POST">
                     {% csrf_token %}
 
-                    <h1>{{ current_question_number }}. {{ question }}</h1>
+                    
                     <br>
                     <br>  
                     {% if question.question_type == 'yes_no' %}
+                    <h1>{{ current_question_number }}/{{ test_question_amount }}</h1>
+                    <h1>{{ current_question_number }}. {{ question }}</h1>
                       <label>
                         <input type="radio" name="question_{{ q.id }}" value="Այո" required> Այո
                       </label>
@@ -34,6 +32,8 @@
                       </label>
   
                     {% elif question.question_type == 'multiple_choice' %}
+                    <h1>{{ current_question_number }}/{{ test_question_amount }}</h1>
+                    <h1>{{ current_question_number }}. {{ question }}</h1>
                       {% for opt in q.get_options %}
                         <label>
                           <input type="radio" name="question_{{ q.id }}" value="{{ opt }}" required> {{ opt }}
@@ -41,29 +41,63 @@
                       {% endfor %}
   
                     {% elif question.question_type == 'open_text' %}
+                    <h1>{{ current_question_number }}/{{ test_question_amount }}</h1>
+                    <h1>{{ current_question_number }}. {{ question }}</h1>
                       <textarea name="question_{{ q.id }}" rows="3" cols="50" required></textarea>
   
+               
                     {% elif question.question_type == 'rating_scale' %}
-                    <div class="rating-scale-wrapper">
-                        <div class="scale-labels">
-                            <span>{{ question.scale_min }}</span>
-                            <span>{{ question.scale_max }}</span>
+                    <h1>{{ current_question_number }}/{{ test_question_amount }}</h1>
+                    <div class="rating-container">
+                        <div class="rating-instructions">
+                            <div class="instruction-header">
+                                📝 Խնդրում ենք կարդալ յուրաքանչյուր հարցը ուշադիր և գնահատել Ձեր համաձայնության աստիճանը՝
+                            </div>
+                    
+                            <div class="scale-definition compact">
+                                <div class="scale-endpoints">
+                                    <strong>1 – Բացարձակ համաձայն չեմ,       10 – Լիովին համաձայն եմ</strong>
+                                    
+                                </div>
+                            </div>
+                    
+                            <div class="instructions compact">
+                                
+                                <div class="instruction-item">⚡ Պատասխանեք արագ ու անկեղծ</div>
+                                <div class="instruction-item">🎯 Չկան «ճիշտ» կամ «սխալ» պատասխաններ</div>
+                            </div>
                         </div>
-                        <input type="range" 
-                               class="form-range" 
-                               min="{{ question.scale_min }}" 
-                               max="{{ question.scale_max }}" 
-                               value="{{ question.scale_min }}"
-                               name="rating_value"
-                               id="ratingSlider">
-                        <output id="currentValue">{{ question.scale_min }}</output>
+                    
+                        <h1 class="question-text"> {{ question }}</h1>
+                        
+                        <div class="rating-scale-wrapper">
+                            <div class="slider-container">
+                                <input type="range" 
+                                       class="form-range" 
+                                       min="{{ question.scale_min }}" 
+                                       max="{{ question.scale_max }}" 
+                                       value="{{ question.scale_min }}"
+                                       name="rating_value"
+                                       id="ratingSlider">
+                                <div class="scale-labels">
+                                    <span>1</span>
+                                    <span>10</span>
+                                </div>
+                            </div>
+                            <output id="currentValue" class="selected-value">{{ question.scale_min }}</output>
+                        </div>
                     </div>
+                
                     
                         
                     {% else %}
-                     
+                    <h1>{{ current_question_number }}/{{ test_question_amount }}</h1>
+                    <h1>{{ current_question_number }}. {{ question }}</h1>
+                     <br>
 
                     {% for answer in answers %}
+
+                
                     <div class="form-check" align="left" style="margin: 0px 0px 0px 0px">
                         <input class="form-check-input" type="checkbox" value="{{answer.id}}" id="{{answer}}"
                                name="boxes">
@@ -79,11 +113,11 @@
 
                     {% if not last_question %}
                     <div class="text-center">
-                        <button type="submit" class="btn-get-started scrollto" name="next">Далее</button>
+                        <button type="submit" class="btn-get-started scrollto" name="next">Հաջորդը</button>
                     </div>
                     {% else %}
                     <div class="text-center">
-                        <button type="submit" class="btn-get-started scrollto" name="last">Далее</button>
+                        <button type="submit" class="btn-get-started scrollto" name="last">Հաջորդը</button>
                     </div>
                     {% endif %}
                 </form>
@@ -95,6 +129,7 @@
 
 
 <style>
+    
     .rating-scale-wrapper {
         max-width: 600px;
         margin: 0 auto;
@@ -118,6 +153,66 @@
         font-size: 24px;
         margin-top: 10px;
     }
+
+
+
+.rating-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.question-text {
+    margin: 1.5rem 0;
+    color: #2c3e50;
+    font-size: 1.4rem;
+}
+
+.scale-definition.compact {
+    margin: 0.5rem 0;
+}
+
+.instructions.compact {
+    margin: 1rem 0;
+}
+
+.scale-endpoints {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 0.9em;
+}
+
+.slider-container {
+    position: relative;
+    padding: 0 15px;
+}
+
+.scale-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.selected-value {
+    display: block;
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: #3498db;
+    margin-top: 15px;
+}
+
+#ratingSlider {
+    width: 100%;
+    height: 40px;
+}
+
+.instruction-item {
+    margin: 0.5rem 0;
+    padding-left: 1rem;
+}
+    
 </style>
     
 <script>

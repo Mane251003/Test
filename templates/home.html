@@ -4,29 +4,75 @@
 {% block content %}
 
 <section id="hero" class="hero d-flex align-items-center">
-
     <div class="container">
         <div class="row">
+            <!-- Տեքստի բաժին -->
             <div class="col-lg-6 d-flex flex-column justify-content-center">
-                <h1 data-aos="fade-up">Онлайн тесты на разные тематики: на эрудицию, психологические, IQ</h1>
-                <h2 data-aos="fade-up" data-aos-delay="400">Пройди наши тесты, узнай свои недостатки и преимущества,
-                    проанализируй свое поведение и стань лучше!</h2>
-                <div data-aos="fade-up" data-aos-delay="600">
+                <!-- Թեկնածուների բլոկ -->
+                <div class="feature-highlight mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-person-badge fs-3 text-success me-3"></i>
+                        <h3 class="mb-0">Թեկնածուների համար</h3>
+                    </div>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check2-circle me-2 text-success"></i>Անցնել հոգեբանական թեստ</li>
+                        <li><i class="bi bi-code-square me-2 text-primary"></i> Ցուցադրել տեխնիկական հմտությունները</li>
+                    </ul>
+                </div>
+
+                <!-- Գործատուների բլոկ -->
+                <div class="feature-highlight mb-4" data-aos="fade-up" data-aos-delay="500">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-building fs-3 text-primary me-3"></i>
+                        <h3 class="mb-0">Գործատուների համար</h3>
+                    </div>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-graph-up me-2 text-info"></i>Արդյունքների մանրամասն վերլուծություն</li>
+                        <li><i class="bi bi-people me-2 text-warning"></i>Թիմին համապատասխանող թեկնածուներ</li>
+                    </ul>
+                </div>
+
+                <!-- Կոճակ -->
+                <div data-aos="fade-up" data-aos-delay="700">
                     <div class="text-center text-lg-start">
-                        <a href="{% url 'tests' %}"
+                        <a href="{% url 'tests' %}" 
                            class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center">
-                            <span>К тестам!</span>
-                            <i class="bi bi-arrow-right"></i>
+                            <span>Դեպի թեստերը</span>
+                            <i class="bi bi-arrow-right ms-2"></i>
                         </a>
                     </div>
                 </div>
             </div>
+
+            <!-- Նկարի բաժին -->
             <div class="col-lg-6 hero-img" data-aos="zoom-out" data-aos-delay="200">
-                <img src="{% static 'img/hero-img.png' %}" class="img-fluid" alt="">
+                <img src="{% static 'img/hero-img.png' %}" class="img-fluid" alt="DevMind հարթակ">
             </div>
         </div>
     </div>
-
 </section>
 
+<style>
+.feature-highlight {
+    padding: 1.5rem;
+    border-left: 4px solid transparent;
+    border-radius: 8px;
+    background: rgba(248, 249, 250, 0.5);
+    transition: all 0.3s ease;
+}
+
+.feature-highlight:hover {
+    transform: translateX(10px);
+    border-color: var(--bs-primary);
+}
+
+.list-unstyled li {
+    padding: 0.5rem 0;
+    font-size: 1.1rem;
+}
+</style>
+
 {% endblock %}
+
+
+

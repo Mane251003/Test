@@ -10,8 +10,10 @@
         <header class="section-header">
             <br>
             <br>
-            <h2>Количество тестов: {{test_count}}</h2>
-            <p>Выбери и пройди тест, чтобы узнать о себе больше!</p>
+            <h2>Թեստերի քանակ՝{{test_count}}</h2>
+            <p>Ընտրեք և անցեք թեստը՝ ձեր կամ թեկնածուի մասին ավելին իմանալու համար։
+
+            </p>
         </header>
 
         <div class="row">
@@ -23,10 +25,10 @@
                     <h3 class="post-title">{{test.test_name}}</h3>
 
                     {% if user.is_authenticated %}
-                    <a href="{{test.get_url}}" class="readmore stretched-link mt-auto"><span>Начать тест</span><i
+                    <a href="{{test.get_url}}" class="readmore stretched-link mt-auto"><span>Սկսել թեստը</span><i
                             class="bi bi-arrow-right"></i></a>
                     {% else %}
-                    <a href="{% url 'login' %}" class="readmore stretched-link mt-auto"><span>Начать тест</span><i
+                    <a href="{% url 'login' %}" class="readmore stretched-link mt-auto"><span>Սկսել թեստը</span><i
                             class="bi bi-arrow-right"></i></a>
                     {% endif %}
                 </div>

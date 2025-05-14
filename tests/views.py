@@ -107,7 +107,7 @@ def question_details(request, category_slug, test_slug, question_id):
             if request.method == 'POST':
                 previous_question_id = request.META.get('HTTP_REFERER').split('=')[1]
                 previous_question = Question.objects.get(pk=int(previous_question_id))
-
+                print(f'type {previous_question.question_type}')
                 if previous_question.question_type == 'rating_scale':
                     rating_value = float(request.POST.get('rating_value', 0))
                     UserResponse.objects.update_or_create(
@@ -118,15 +118,15 @@ def question_details(request, category_slug, test_slug, question_id):
                 
                     # For rating questions, count as correct if answered
                     request.session['correct_answers'] += 1
-                
-                elif previous_question.question_type in ['yes_no', 'multiple_choice']:
+                    
+                elif previous_question.question_type in ['yes_no', 'multiple_choice', None]:
                     answers = Answer.objects.filter(question__pk=previous_question_id)
                     id_list = request.POST.getlist('boxes')
                     checked_answers = [Answer.objects.get(pk=int(answer_id)) for answer_id in id_list]
                     correct = all([answer.is_correct for answer in checked_answers])
                     unchecked_answers = [answer.is_correct for answer in answers if answer not in checked_answers]
                     #question = Question.objects.get(pk=int(previous_question_id))
-
+                    print(f'type {previous_question.question_type}')
                     if correct and True not in unchecked_answers:
                        request.session['correct_answers'] += 1
                     else:
@@ -191,6 +191,7 @@ def results(request, category_slug=None, test_slug=None):
         data.category = Category.objects.get(slug=category_slug)
         data.test = Test.objects.get(slug=test_slug)
         data.correct_answer_count = request.session.get("correct_answers", 0)
+        print(f"correct answer count is {data.correct_answer_count}")
         data.wrong_answer_count = request.session.get("wrong_answers", 0)
         
         if test_question_amount > 0:

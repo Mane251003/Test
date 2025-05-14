@@ -7,13 +7,13 @@
 
         <a href="{% url 'home' %}" class="logo d-flex align-items-center">
             <img src="{% static 'img/logo.png' %}" alt="">
-            <span>TestoMania</span>
+            <span>DevMind</span>
         </a>
 
         <nav id="navbar" class="navbar">
             <ul>
-                <li><a class="nav-link scrollto" href="{% url 'tests' %}">Все тесты</a></li>
-                <li class="dropdown"><a href="javascript:void(0)"><span>Категории</span> <i
+                <li><a class="nav-link scrollto" href="{% url 'tests' %}">Բոլոր թեստեր</a></li>
+                <li class="dropdown"><a href="javascript:void(0)"><span>Կատեգորիա</span> <i
                         class="bi bi-chevron-down"></i></a>
                     <ul>
                         {% for category in links %}
@@ -22,11 +22,11 @@
                     </ul>
                 </li>
                 {% if user.id is None %}
-                <li><a class="widget-header" href="{% url 'login' %}">Вход</a></li>
-                <li><a class="widget-header" href="{% url 'register' %}">Регистрация</a></li>
+                <li><a class="widget-header" href="{% url 'login' %}">Դուրս գալ</a></li>
+                <li><a class="widget-header" href="{% url 'register' %}">Գրանցվել</a></li>
                 {% else %}
                 <li><a class="widget-header">Привет, {{user.first_name}}!</a></li>
-                <li><a class="widget-header" href="{% url 'logout' %}">Выход</a></li>
+                <li><a class="widget-header" href="{% url 'logout' %}">Դուրս Գալ</a></li>
                 {% endif %}
             </ul>
             <i class="bi bi-list mobile-nav-toggle"></i>
